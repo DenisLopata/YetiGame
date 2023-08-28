@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://b4236vo0mwt51"]
+
+[ext_resource type="Texture2D" uid="uid://bue2pqy8ljm0k" path="res://Assets/Player/tile_0083.png" id="1_gyj0g"]
+[ext_resource type="Script" path="res://Scenes/Entities/PlayerBody.gd" id="1_nkj11"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_y4iey"]
+radius = 8.0
+height = 16.0
+
+[node name="Player" type="Node2D"]
+
+[node name="PlayerBody" type="CharacterBody2D" parent="."]
+position = Vector2(50, 50)
+script = ExtResource("1_nkj11")
+
+[node name="Sprite" type="Sprite2D" parent="PlayerBody"]
+texture = ExtResource("1_gyj0g")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerBody"]
+shape = SubResource("CapsuleShape2D_y4iey")
+
+[node name="Camera2D" type="Camera2D" parent="PlayerBody"]
+
+[node name="Trail" type="Marker2D" parent="PlayerBody"]
+
+[node name="TrailSprite" type="Sprite2D" parent="PlayerBody/Trail"]

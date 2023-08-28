@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://cr6uicrklq7fs"]
+
+[ext_resource type="Texture2D" uid="uid://dxui4j6odsrb2" path="res://Assets/Flags/tile_0020.png" id="1_x4fxj"]
+
+[node name="Flag" type="StaticBody2D"]
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_x4fxj")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(8, 8, -4.4, 8, -8, 5.4, -8, -8, 8, -8)
