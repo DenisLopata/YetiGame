@@ -23,10 +23,6 @@ func _ready() -> void:
 	generate()
 	generate_tiles_around_player()
 
-
-func _process(delta):
-	pass
-
 func _physics_process(_delta: float) -> void:
 	# Every frame, we compare the player's position to the current sector. If
 	# they move far enough from it, we need to update the world.

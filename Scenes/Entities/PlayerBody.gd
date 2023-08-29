@@ -11,7 +11,8 @@ extends CharacterBody2D
 @onready var trail_full := preload("res://Assets/Trails/trail_full.png")
 @onready var trail_end := preload("res://Assets/Trails/trail_end.png")
 
-@export var acceleration_simple := 0.5
+@export var acceleration_simple := 1
+@export var friction_simple: float = 50
 const SPEED: float = 300.0
 const JUMP_VELOCITY: float = -400.0
 var count: int = 0
@@ -31,6 +32,12 @@ func move(delta: float) -> void:
 #	move_spaceship(delta)
 	var speed = move_simple(delta)
 	add_trail(speed)
+
+func accelerate(direction: Vector2) -> void:
+	velocity = velocity.move_toward(SPEED * direction, acceleration_simple)
+	
+func apply_friction() -> void:
+	velocity = velocity.move_toward(Vector2.ZERO, friction_simple)
 
 func add_trail(speed: int) -> void:
 	
@@ -82,20 +89,26 @@ func add_trail(speed: int) -> void:
 #	add_child(trail_sprite2)
 
 func move_simple(delta: float) -> int:
-#
 	var direction := Vector2(
 		Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left"),
 		Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
 	)
+	
 	if direction.length() > 1.0:
 		direction = direction.normalized()
-#
+		
+	if direction != Vector2.ZERO:
+		accelerate(direction)
+	else:
+		apply_friction()
+		
 	# Using the follow steering behavior.
-	var target_velocity = direction * SPEED
-	var old_velocity = (target_velocity - velocity) * friction
-	velocity += (target_velocity - velocity) * friction
-	var speed := int(velocity.distance_to(old_velocity))
+#	var target_velocity = direction * SPEED
+#	var old_velocity = (target_velocity - velocity) * friction
+#	velocity += (target_velocity - velocity) * friction
+#	var speed := int(velocity.distance_to(old_velocity))
 	
+	var speed := velocity.y
 	move_and_slide()
 	return speed
 	
