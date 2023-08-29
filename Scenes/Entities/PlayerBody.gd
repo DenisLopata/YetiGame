@@ -12,7 +12,7 @@ extends CharacterBody2D
 @onready var trail_end := preload("res://Assets/Trails/trail_end.png")
 
 @export var acceleration_simple := 1
-@export var friction_simple: float = 50
+@export var friction_simple: float = 5
 const SPEED: float = 300.0
 const JUMP_VELOCITY: float = -400.0
 var count: int = 0
