@@ -11,6 +11,7 @@ extends CharacterBody2D
 @onready var trail_full := preload("res://Assets/Trails/trail_full.png")
 @onready var trail_end := preload("res://Assets/Trails/trail_end.png")
 
+@export var player_speed : int = 0
 @export var acceleration_simple := 1
 @export var friction_simple: float = 5
 const SPEED: float = 300.0
@@ -31,7 +32,8 @@ func _physics_process(delta: float) -> void:
 func move(delta: float) -> void:
 #	move_spaceship(delta)
 	var speed = move_simple(delta)
-	add_trail(speed)
+	player_speed = speed
+#	add_trail(speed)
 
 func accelerate(direction: Vector2) -> void:
 	velocity = velocity.move_toward(SPEED * direction, acceleration_simple)
@@ -39,9 +41,9 @@ func accelerate(direction: Vector2) -> void:
 func apply_friction() -> void:
 	velocity = velocity.move_toward(Vector2.ZERO, friction_simple)
 
+	
 func add_trail(speed: int) -> void:
 	
-	print(speed)
 	
 	#remove old children
 	var trail_children = trail_node.get_child_count()
