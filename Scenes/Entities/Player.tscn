@@ -11,6 +11,10 @@ height = 16.0
 [node name="Player" type="Node2D"]
 script = ExtResource("1_mn166")
 
+[node name="GlobalTrail" type="Marker2D" parent="."]
+
+[node name="Sprite" type="Sprite2D" parent="GlobalTrail"]
+
 [node name="PlayerBody" type="CharacterBody2D" parent="."]
 position = Vector2(50, 50)
 script = ExtResource("1_nkj11")
@@ -26,7 +30,3 @@ shape = SubResource("CapsuleShape2D_y4iey")
 [node name="Trail" type="Marker2D" parent="PlayerBody"]
 
 [node name="TrailSprite" type="Sprite2D" parent="PlayerBody/Trail"]
-
-[node name="GlobalTrail" type="Marker2D" parent="."]
-
-[node name="Sprite" type="Sprite2D" parent="GlobalTrail"]

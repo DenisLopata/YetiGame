@@ -10,25 +10,38 @@ var background_tiles: Array[Vector2i] = [Vector2i(0,0)
 
 ## The Flags
 @export var Flag: PackedScene
+@export var Yeti: Node2D
 
 @onready var _screen_size = get_viewport_rect().size
 ## The number of asteroids to place in each sector.
 @export var asteroid_density := 3
 @onready var player = $Player/PlayerBody
+#@onready var yeti_node = $Yeti as Node2D
 @onready var ground = $Ground as TileMap
 @onready var path = $Path as TileMap
+@onready var yeti_node := preload("res://Scenes/Entities/Yeti.tscn")
 
 func _ready() -> void:
 	Flag = load("res://Scenes/Entities/Flag.tscn")
 	generate()
 	generate_tiles_around_player()
+#	yeti_node = Node2D.new()
+	add_yeti()
 
+func add_yeti() -> void:
+	var yeti = yeti_node.instantiate()
+	yeti.position = player.position
+	yeti.position.y = yeti.position.y - 64
+	add_child(yeti)
+	Yeti = yeti
+	
+	
 func _physics_process(_delta: float) -> void:
 	# Every frame, we compare the player's position to the current sector. If
 	# they move far enough from it, we need to update the world.
 	var sector_location := _current_sector * sector_size
 	var distance = player.global_position.distance_squared_to(sector_location)
-	
+	$Yeti/YetiBody.follow_player(player.position)
 	if player.global_position.distance_squared_to(sector_location) > _sector_size_squared:
 		# Our function to update the sectors takes a vector to offset. As the
 		# player can be moving left, right, up, or down, we store that
