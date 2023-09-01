@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://lchry6bk3q4a"]
+[gd_scene load_steps=7 format=3 uid="uid://bvnfgtc7w8xjs"]
 
 [ext_resource type="Texture2D" uid="uid://dcs11k2qyk2gs" path="res://Assets/Yeti/tile_0078.png" id="1_irlpf"]
 [ext_resource type="Script" path="res://Scenes/Entities/YetiBody.gd" id="1_v4x32"]
