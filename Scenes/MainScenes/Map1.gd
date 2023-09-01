@@ -20,11 +20,13 @@ var background_tiles: Array[Vector2i] = [Vector2i(0,0)
 @onready var ground = $Ground as TileMap
 @onready var path = $Path as TileMap
 @onready var yeti_node := preload("res://Scenes/Entities/Yeti.tscn")
+var non_path_array = []
+var non_path_array_global = []
 
 func _ready() -> void:
 	Flag = load("res://Scenes/Entities/Flag.tscn")
-	generate()
 	generate_tiles_around_player()
+	generate()
 #	yeti_node = Node2D.new()
 	add_yeti()
 
@@ -60,6 +62,7 @@ func generate_tiles_around_player() -> void:
 		var tile_pos = ground.local_to_map(glbl)
 		
 		var path_coords := []
+		var background_coords := []
 		var path_width := 5
 		var cnt = 0
 		for x in range(- 100, 100):
@@ -68,7 +71,7 @@ func generate_tiles_around_player() -> void:
 						tile_pos.x + x,
 						tile_pos.y + y
 					)
-#				ground.set_cell(0, cell_rect, 1, Vector2(1,1))
+				background_coords.append(cell_rect)
 				var rng_bckg_tile = background_tiles[randi()%background_tiles.size()]
 				ground.set_cell(0, cell_rect, 1, rng_bckg_tile)
 				if x >= -path_width and x <= path_width:
@@ -80,6 +83,23 @@ func generate_tiles_around_player() -> void:
 					
 					cnt = cnt + 1
 		path.set_cells_terrain_connect(0, path_coords, 0, 0)
+		
+		var same_cnt = 0
+		non_path_array = background_coords
+		for coord in path_coords:
+			var non_path = non_path_array.has(coord)
+			var same_index = non_path_array.bsearch(coord)
+			if non_path:
+				same_cnt = same_cnt + 1
+				non_path_array.remove_at(same_index)
+		
+		for non in non_path_array:
+			var tile_pos2 = ground.map_to_local(non)
+			non_path_array_global.append(tile_pos2)
+				
+#		var non_path = background_coords.rfind(path_coords)
+		var same = same_cnt
+		var same_size = non_path_array.size()
 				
 
 	
@@ -108,7 +128,9 @@ func _generate_sector(x_id: int, y_id: int) -> void:
 		add_child(flag)
 	
 		# We generate a random position for each asteroid within the rectangle's bounds.
-		flag.position = _generate_random_position(x_id, y_id)
+#		flag.position = _generate_random_position(x_id, y_id)
+		
+		flag.position = non_path_array_global[randi()%non_path_array_global.size()]
 #		flag.rotation = _rng.randf_range(-PI, PI)
 #		flag.scale *= _rng.randf_range(0.2, 1.0)
 		sector_data.append(flag)

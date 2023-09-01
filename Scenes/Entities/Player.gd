@@ -25,7 +25,7 @@ func _physics_process(delta):
 		if(trail_children_count > 0):
 			var last_child := trail_node.get_child(trail_children_count - 1) as Sprite2D
 			var distance = last_child.position.distance_to(player_body_position)
-			print(distance - 16)
+#			print(distance - 16)
 			if distance > 21:
 				trail_sprite = Sprite2D.new()
 				trail_sprite.position = Vector2(player_body_position.x, player_body_position.y - 16)
