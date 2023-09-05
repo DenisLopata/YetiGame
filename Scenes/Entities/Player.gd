@@ -5,7 +5,6 @@ extends Node2D
 @onready var player_body_node := $PlayerBody as CharacterBody2D
 @onready var trail_full := preload("res://Assets/Trails/trail_full.png")
 @onready var trail_end := preload("res://Assets/Trails/trail_end.png")
-var last_player_position: Vector2
 
 func _physics_process(delta):
 	

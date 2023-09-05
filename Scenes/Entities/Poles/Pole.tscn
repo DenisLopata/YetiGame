@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2txdmkqd68nh"]
+
+[ext_resource type="Texture2D" uid="uid://d3gfip58mr02w" path="res://Assets/Poles/primary_small.png" id="2_j2j8l"]
+
+[node name="Pole" type="StaticBody2D"]
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_j2j8l")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(8, 8, -8, 8, -8, -8, 8, -8)
