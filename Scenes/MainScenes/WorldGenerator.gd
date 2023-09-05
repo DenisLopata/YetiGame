@@ -1,105 +1,109 @@
 class_name WorldGenerator
 extends Node2D
 
-## When the player moves around the world, we generate sectors only in the direction they are moving. And to do so, we think in term of the axis the player Is moving along. These two constants represent the X and Y axes respectively.
-enum { AXIS_X, AXIS_Y }
+## The number of items to place on map.
+@export var item_density := 300
+@export var number_of_poles := 10
+## The Flags
+@export var Flag: PackedScene
+@export var Pole: PackedScene
+@export var Yeti: Node2D
+@onready var yeti_node := preload("res://Scenes/Entities/Yeti.tscn")
+var non_path_array = PackedVector2Array()
+var non_path_array_global = PackedVector2Array()
+var path_array_global = PackedVector2Array()
+var path_pole_array_global = []
+var current_pole_position : Vector2
+var img_size_px := 16
 
-## Size of a sector in pixels.
-@export var sector_size := 1000.0
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
 
-## Number of sectors to generate around the player on a given axis.
-@export var sector_axis_count := 10
 
-## Seed to generate the world. We will use a hash function to convert it to a unique number for each sector. See the `make_seed_for()` function below.
-## This makes the world generation deterministic.
-@export var start_seed := "world_generation"
-## This dictionary can store important data about any generated sector, or even custom data for persistent worlds.
-var _sectors := {}
-## Coordinates of the sector the player currently is in. We use it to generate _sectors around the player.
-var _current_sector : Vector2 = Vector2.ZERO
-## There are some built-in functions in GDScript to generate random numbers, but the random number generator allows us to use a specific seed and provides more methods, which is useful for procedural generation.
-var _rng := RandomNumberGenerator.new()
-
-## We will reuse the three values below several times so we pre-calculate them.
-@onready var _half_sector_size := sector_size / 2.0
-@onready var _sector_size_squared := sector_size * sector_size
-@onready var _half_sector_count := int(sector_axis_count / 2.0)
-
-## Calls `_generate_sector()` for each sector in a grid around the player.
-func generate() -> void:
-	for x in range(-_half_sector_count, _half_sector_count):
-		for y in range(-_half_sector_count, _half_sector_count):
-			_generate_sector(x, y)
-
-## Updates generated sectors around the player based on `difference`, a cell offset.
-func _update_sectors(difference: Vector2) -> void:
-	_update_along_axis(AXIS_X, difference.x)
-	_update_along_axis(AXIS_Y, difference.y)
-	
-## Virtual function that governs how we should generate a given sector based
-## on its position in the infinite grid.
-func _generate_sector(_x_id: int, _y_id: int) -> void:
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
 	pass
-
-## Travels along an axis and a direction, erasing sectors in the perpendicular axis that are too far
-## away from the player and generating new sectors that come into this range.
-func _update_along_axis(axis: int, difference: float) -> void:
-
-	if difference == 0 or (axis != AXIS_X and axis != AXIS_Y):
-		return
-
-	# We're going to use the `difference` argument in calculations below to determine the sectors to
-	# generate and to delete.
-	# Depending on the direction the player is moving, we need to correct for the calculations
-	# below.
-	# When `difference` is positive, we end up in situations where sectors aren't erased or added on
-	# time. This value is there to catch those cases.
-	var axis_modifier := int(difference > 0)
-	# We extract the `_current_sector`'s row or column depending on the axis we want to walk.
-	var sector_axis_coordinate := _current_sector.x if axis == AXIS_X else _current_sector.y
-	# We calculate the coordinate of the row or column of the new line of sectors to create.
-	var new_sector_line_index := int(
-		sector_axis_coordinate + (_half_sector_count - axis_modifier) * difference + difference
-	)
-
-	# We find the range of coordinates of the row or column *perpendicular* to the
-	# axis we're updating.
-	var other_axis_position := _current_sector.y if axis == AXIS_X else _current_sector.x
-	var other_axis_min := other_axis_position - _half_sector_count
-	var other_axis_max := other_axis_position + _half_sector_count
 	
+func _generate_map(player_position: Vector2) -> void:
+	_add_flags()
+	_add_poles()
+	# We store references to all asteroids to free them later.
+#	_sectors[Vector2(x_id, y_id)] = sector_data
 
-	# We generate a new entire row or column perpendicular to the axis along which we're moving.
-	for other_axis_coordinate in range(other_axis_min, other_axis_max):
-		var x := new_sector_line_index if axis == AXIS_X else other_axis_coordinate
-		var y := other_axis_coordinate if axis == AXIS_X else new_sector_line_index
-		_generate_sector(x, y)
-
-	# We then want to delete the row or column on the opposite end of the grid.
-	var obsolete_sector_line_index := int(new_sector_line_index + sector_axis_count * -difference)
-	for other_axis_coordinate in range(other_axis_min, other_axis_max):
-		var key := Vector2(
-			obsolete_sector_line_index if axis == AXIS_X else other_axis_coordinate,
-			other_axis_coordinate if axis == AXIS_X else obsolete_sector_line_index
-		)
-
-		# We free all asteroids in this sector and remove the corresponding key.
-		if _sectors.has(key):
-			var sector_data: Array = _sectors[key]
-			for d in sector_data:
-				d.queue_free()
-			var _found := _sectors.erase(key)
-
-	# And now we're done updating the world, we update the `_current_sector`.
-	if axis == AXIS_X:
-		_current_sector.x += difference
-	else:
-		_current_sector.y += difference
+func _add_flags() -> void:
+	# List of entities generated in this sector.
+	var sector_data := []
+	for _i in range(item_density):
+		var flag := Flag.instantiate()
+		add_child(flag)
+	
+		#TODO remove values from array so we do not spawn on same tile
+		flag.position = non_path_array_global[randi()%non_path_array_global.size()]
+		sector_data.append(flag)
+	
+func _add_poles() -> void:
+	# List of entities generated in this sector.
+	var sector_data := []
+	
+	for _i in range(number_of_poles):
+		if path_pole_array_global.size() == 0:
+			return
+		#create first pole
+		var pole := Pole.instantiate()
+		add_child(pole)
+		#get random position
+		var pole_index = randi()%path_pole_array_global.size()
+		var pole_position = path_pole_array_global[pole_index]
+		current_pole_position = pole_position
 		
-## Creates a text string for the seed with the format "seed_x_y" and uses the hash method to turn it into an integer.
-## This allows us to use it with the `RandomNumberGenerator.seed` property.
-func make_seed_for(_x_id: int, _y_id: int, custom_data := "") -> int:
-	var new_seed := "%s_%s_%s" % [start_seed, _x_id, _y_id]
-	if not custom_data.is_empty():
-		new_seed = "%s_%s" % [new_seed, custom_data]
-	return new_seed.hash()
+		#remove that position so we do not spawn two poles on same tile
+		path_pole_array_global.remove_at(pole_index)
+		#get all poles on same Y axis
+		var pole_same_y = path_pole_array_global.filter(same_y_position)
+		#remove all on same Y axis for future generation
+		path_pole_array_global = path_pole_array_global.filter(not_same_y_position)
+		
+		
+		#create second pole
+		var pole_end := Pole.instantiate()
+		add_child(pole_end)
+		#space between two poles on X Axis
+		pole_same_y = pole_same_y.filter(space_between_x)
+		
+		pole_end.position = pole_same_y[randi()%pole_same_y.size()]
+#		pole_end.rotation = deg_to_rad(180)
+		
+		
+		pole.position = pole_position
+		
+		#create space on Y axis
+		path_pole_array_global = path_pole_array_global.filter(space_between_y)
+		
+		if(pole.position.x > pole_end.position.x):
+			pole.set_flip_h = true
+		else:
+			pole_end.set_flip_h = true
+			
+		sector_data.append(pole)
+		sector_data.append(pole_end)
+	
+func space_between_y(vector: Vector2):
+	if vector.y <= current_pole_position.y - img_size_px * 5 or vector.y >= current_pole_position.y + img_size_px * 5:
+		return vector
+		
+
+func space_between_x(vector: Vector2):
+	if vector.x <= current_pole_position.x - img_size_px * 3 or vector.x >= current_pole_position.x + img_size_px * 3:
+		return vector
+		
+
+func same_y_position(vector: Vector2):
+	if vector.y == current_pole_position.y:
+		return vector
+		
+
+func not_same_y_position(vector: Vector2):
+	if vector.y != current_pole_position.y:
+		return vector
+		

@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://c2txdmkqd68nh"]
+[gd_scene load_steps=3 format=3 uid="uid://c2txdmkqd68nh"]
 
+[ext_resource type="Script" path="res://Scenes/Entities/Poles/Pole.gd" id="1_d6ypy"]
 [ext_resource type="Texture2D" uid="uid://d3gfip58mr02w" path="res://Assets/Poles/primary_small.png" id="2_j2j8l"]
 
 [node name="Pole" type="StaticBody2D"]
+script = ExtResource("1_d6ypy")
 
 [node name="Sprite" type="Sprite2D" parent="."]
 texture = ExtResource("2_j2j8l")

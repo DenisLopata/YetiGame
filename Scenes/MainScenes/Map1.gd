@@ -8,29 +8,22 @@ var background_tiles: Array[Vector2i] = [Vector2i(0,0)
 , Vector2i(1,4)
 , Vector2i(4,4)]
 
-## The Flags
-@export var Flag: PackedScene
-@export var Pole: PackedScene
-@export var Yeti: Node2D
+var map_size_y := 100
 
-@onready var _screen_size = get_viewport_rect().size
-## The number of asteroids to place in each sector.
-@export var asteroid_density := 3
-@onready var player = $Player/PlayerBody
+@onready var _screen_size = self.get_viewport_rect().size
+@onready var player = $Player/PlayerBody as CharacterBody2D
 #@onready var yeti_node = $Yeti as Node2D
 @onready var ground = $Ground as TileMap
 @onready var path = $Path as TileMap
-@onready var yeti_node := preload("res://Scenes/Entities/Yeti.tscn")
-var non_path_array = PackedVector2Array()
-var non_path_array_global = PackedVector2Array()
-var path_array_global = PackedVector2Array()
-var path_pole_array_global = PackedVector2Array()
 
 func _ready() -> void:
 	Flag = load("res://Scenes/Entities/Flag.tscn")
 	Pole = load("res://Scenes/Entities/Poles/Pole.tscn")
 	generate_tiles_around_player()
-	generate()
+	var player_position = player.position as Vector2
+	_generate_map(player_position)
+#	_generate_sector(0,0)
+#	generate()
 #	yeti_node = Node2D.new()
 	add_yeti()
 
@@ -43,22 +36,7 @@ func add_yeti() -> void:
 	
 	
 func _physics_process(_delta: float) -> void:
-	# Every frame, we compare the player's position to the current sector. If
-	# they move far enough from it, we need to update the world.
-	var sector_location := _current_sector * sector_size
-	var distance = player.global_position.distance_squared_to(sector_location)
 	$Yeti/YetiBody.follow_player(player.position)
-	if player.global_position.distance_squared_to(sector_location) > _sector_size_squared:
-		# Our function to update the sectors takes a vector to offset. As the
-		# player can be moving left, right, up, or down, we store that
-		# information in our sector_offset variable.
-		var sector_offset := Vector2.ZERO
-		sector_offset = (player.global_position - sector_location) / sector_size
-		sector_offset.x = int(sector_offset.x)
-		sector_offset.y = int(sector_offset.y)
-		_update_sectors(sector_offset)
-		generate_tiles_around_player()
-		print("--------DONE GENERATE------------")
 	
 func generate_tiles_around_player() -> void:
 	
@@ -70,7 +48,7 @@ func generate_tiles_around_player() -> void:
 		var path_width := 5
 		var cnt = 0
 		for x in range(- 100, 100):
-			for y in range( - 100, 100):
+			for y in range( - 100, map_size_y):
 				var cell_rect := Vector2(
 						tile_pos.x + x,
 						tile_pos.y + y
@@ -104,12 +82,17 @@ func generate_tiles_around_player() -> void:
 			
 		#convert path to global
 		path_array_global = get_global_coords_from_local(path_coords, path)
-		path_pole_array_global = path_array_global
+		path_pole_array_global = path_array_global as Array
+		path_pole_array_global = path_pole_array_global.filter(infront_player_position)
 #		for path_coord in path_coords:
 #			var tile_pos2 = path.map_to_local(path_coord)
 #			path_array_global.append(tile_pos2)
 			
 				
+func infront_player_position(vector: Vector2):
+	if vector.y > player.position.y:
+		return vector
+	
 func get_global_coords_from_local(array: PackedVector2Array, tileMap: TileMap) -> PackedVector2Array:
 	var helper_array = PackedVector2Array()
 	#convert path to global
@@ -118,63 +101,4 @@ func get_global_coords_from_local(array: PackedVector2Array, tileMap: TileMap) -
 		helper_array.append(tile_pos)
 	return helper_array
 	
-func generate_collision_path_around_player(x: int, cell_rect: Vector2) -> void:
-		var path_coords := []
-		var path_width := 5
-		if x >= -path_width and x <= path_width:
-			if x == -path_width:
-					path.set_cell(0, Vector2(x, cell_rect.y), 0, Vector2i(1,0))
-			elif x == path_width:
-					path.set_cell(0, Vector2(x, cell_rect.y), 0, Vector2i(4,0))
-			else:
-					path.set_cell(0, Vector2(x, cell_rect.y), 0, Vector2i(2,0))
-	
-# Generates items and places them inside
-# of the sector's bounds with a random position, rotation, and scale.
-func _generate_sector(x_id: int, y_id: int) -> void:
-#	_rng.seed = make_seed_for(x_id, y_id)
-	
-	# List of entities generated in this sector.
-	var sector_data := []
-#	var position = _generate_random_position(x_id, y_id)
-	for _i in range(asteroid_density):
-		var flag := Flag.instantiate()
-		add_child(flag)
-	
-		# We generate a random position for each asteroid within the rectangle's bounds.
-#		flag.position = _generate_random_position(x_id, y_id)
-		
-		#TODO remove values from array so we do not spawn on same tile
-		flag.position = non_path_array_global[randi()%non_path_array_global.size()]
-#		flag.rotation = _rng.randf_range(-PI, PI)
-#		flag.scale *= _rng.randf_range(0.2, 1.0)
 
-		sector_data.append(flag)
-		
-	var pole := Pole.instantiate()
-	add_child(pole)
-	var pole_index = randi()%path_pole_array_global.size()
-	var pole_position = path_pole_array_global[pole_index]
-	path_pole_array_global.remove_at(pole_index)
-	pole.position = pole_position
-
-	sector_data.append(pole)
-	# We store references to all asteroids to free them later.
-	_sectors[Vector2(x_id, y_id)] = sector_data
-
-# Returns a random position within the sector's bounds, given the sector's coordinates.
-func _generate_random_position(x_id: int, y_id: int) -> Vector2:
-	# Calculate the sector boundaries based checked the current x and y sector
-	# coordinates.
-	var sector_position = Vector2(x_id * sector_size, y_id * sector_size)
-	var sector_top_left = Vector2(
-		sector_position.x - _half_sector_size, sector_position.y - _half_sector_size
-	)
-	var sector_bottom_right = Vector2(
-		sector_position.x + _half_sector_size, sector_position.y + _half_sector_size
-	)
-	return Vector2(
-		_rng.randf_range(sector_top_left.x, sector_bottom_right.x),
-		_rng.randf_range(sector_top_left.y, sector_bottom_right.y)
-	)
-	
