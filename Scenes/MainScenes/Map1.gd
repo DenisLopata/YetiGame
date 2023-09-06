@@ -8,7 +8,8 @@ var background_tiles: Array[Vector2i] = [Vector2i(0,0)
 , Vector2i(1,4)
 , Vector2i(4,4)]
 
-var map_size_y := 100
+var map_size_x := 30
+var map_size_y := 200
 
 @onready var _screen_size = self.get_viewport_rect().size
 @onready var player = $Player/PlayerBody as CharacterBody2D
@@ -19,6 +20,10 @@ var map_size_y := 100
 func _ready() -> void:
 	Flag = load("res://Scenes/Entities/Flag.tscn")
 	Pole = load("res://Scenes/Entities/Poles/Pole.tscn")
+	TreeGreenBig = load("res://Scenes/Entities/Trees/TreeGreenBig.tscn")
+	TreeBrownBig = load("res://Scenes/Entities/Trees/TreeBrownBig.tscn")
+	TreeGreenSmall = load("res://Scenes/Entities/Trees/TreeGreenSmall.tscn")
+	TreeBrownSmall = load("res://Scenes/Entities/Trees/TreeBrownSmall.tscn")
 	generate_tiles_around_player()
 	var player_position = player.position as Vector2
 	_generate_map(player_position)
@@ -47,7 +52,7 @@ func generate_tiles_around_player() -> void:
 		var background_coords := []
 		var path_width := 5
 		var cnt = 0
-		for x in range(- 100, 100):
+		for x in range(- map_size_x, map_size_x):
 			for y in range( - 100, map_size_y):
 				var cell_rect := Vector2(
 						tile_pos.x + x,

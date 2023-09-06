@@ -4,10 +4,20 @@ extends Node2D
 ## The number of items to place on map.
 @export var item_density := 300
 @export var number_of_poles := 10
+
 ## The Flags
 @export var Flag: PackedScene
 @export var Pole: PackedScene
+
+## Trees
+@export var TreeGreenBig: PackedScene
+@export var TreeBrownBig: PackedScene
+@export var TreeGreenSmall: PackedScene
+@export var TreeBrownSmall: PackedScene
+
+## Enemies
 @export var Yeti: Node2D
+
 @onready var yeti_node := preload("res://Scenes/Entities/Yeti.tscn")
 var non_path_array = PackedVector2Array()
 var non_path_array_global = PackedVector2Array()
@@ -26,15 +36,29 @@ func _process(delta):
 	pass
 	
 func _generate_map(player_position: Vector2) -> void:
+	_add_trees()
 	_add_flags()
 	_add_poles()
 	# We store references to all asteroids to free them later.
 #	_sectors[Vector2(x_id, y_id)] = sector_data
 
+func _add_trees() -> void:
+	# List of entities generated in this sector.
+	var tree_types = [ TreeGreenBig, TreeBrownBig, TreeGreenSmall, TreeBrownSmall ]
+	var sector_data := []
+	for _i in range(item_density):
+		var tree_rand = tree_types[randi()%tree_types.size()] as PackedScene
+		var tree := tree_rand.instantiate()
+		add_child(tree)
+	
+		#TODO remove values from array so we do not spawn on same tile
+		tree.position = non_path_array_global[randi()%non_path_array_global.size()]
+		sector_data.append(tree)
+	
 func _add_flags() -> void:
 	# List of entities generated in this sector.
 	var sector_data := []
-	for _i in range(item_density):
+	for _i in range(item_density / 5):
 		var flag := Flag.instantiate()
 		add_child(flag)
 	
