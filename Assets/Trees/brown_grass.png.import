@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://danot0w1uox5w"
-path="res://.godot/imported/tile_0023.png-e2df16f4a88bbf9ad45e478c64e52a41.ctex"
+uid="uid://b3sscojy4kuwk"
+path="res://.godot/imported/brown_grass.png-57c5eca7e56eabffa927b889cc0b9d87.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Flags/tile_0023.png"
-dest_files=["res://.godot/imported/tile_0023.png-e2df16f4a88bbf9ad45e478c64e52a41.ctex"]
+source_file="res://Assets/Trees/brown_grass.png"
+dest_files=["res://.godot/imported/brown_grass.png-57c5eca7e56eabffa927b889cc0b9d87.ctex"]
 
 [params]
 

@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://1y6jox4mgyts"]
+
+[ext_resource type="Texture2D" uid="uid://b7nsi0v4lltdh" path="res://Assets/Trees/green_tree_small.png" id="1_68ayd"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_doias"]
+radius = 5.0
+height = 16.0
+
+[node name="TreeGreenSmall" type="StaticBody2D"]
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_68ayd")
+region_rect = Rect2(96, 0, 16, 32)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_doias")
