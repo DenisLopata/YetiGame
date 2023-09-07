@@ -1,13 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://c2txdmkqd68nh"]
+[gd_scene load_steps=4 format=3 uid="uid://c2txdmkqd68nh"]
 
 [ext_resource type="Script" path="res://Scenes/Entities/Poles/Pole.gd" id="1_d6ypy"]
 [ext_resource type="Texture2D" uid="uid://d3gfip58mr02w" path="res://Assets/Poles/primary_small.png" id="2_j2j8l"]
 
-[node name="Pole" type="StaticBody2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6n7tb"]
+size = Vector2(16, 16)
+
+[node name="Pole" type="Area2D"]
 script = ExtResource("1_d6ypy")
 
 [node name="Sprite" type="Sprite2D" parent="."]
 texture = ExtResource("2_j2j8l")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(8, 8, -8, 8, -8, -8, 8, -8)
+[node name="CollisionShape" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_6n7tb")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]

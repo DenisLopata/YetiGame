@@ -8,10 +8,12 @@ var background_tiles: Array[Vector2i] = [Vector2i(0,0)
 , Vector2i(1,4)
 , Vector2i(4,4)]
 
-var map_size_x := 30
+
+## 20 is minimum too fill screen 640px width / 16px tile size
+## that is 40, but we split on left and right
+var map_size_x := 40
 var map_size_y := 200
 
-@onready var _screen_size = self.get_viewport_rect().size
 @onready var player = $Player/PlayerBody as CharacterBody2D
 #@onready var yeti_node = $Yeti as Node2D
 @onready var ground = $Ground as TileMap
@@ -39,9 +41,33 @@ func add_yeti() -> void:
 	add_child(yeti)
 	Yeti = yeti
 	
+
+func _draw():
+	draw_line(Vector2(0 - _screen_size.x, 50), Vector2(0 + _screen_size.x, 50), Color(Color.AQUA), 1)
+	draw_line(Vector2(50, 50), Vector2(55, 55), Color(255, 0, 0), 1)
 	
 func _physics_process(_delta: float) -> void:
 	$Yeti/YetiBody.follow_player(player.position)
+	
+	var col_val = player.collision_layer
+	var col_mask = player.collision_mask
+	var player_id = player.get_instance_id()
+	
+	super._physics_process(_delta)
+#	var space_state = get_world_2d().direct_space_state
+#	# use global coordinates, not local to node
+##	var query = PhysicsRayQueryParameters2D.create(Vector2(0, 0), Vector2(50, 100))
+#	var ray_start := Vector2(0 - _screen_size.x, 50)
+#	var ray_end = Vector2(0 + _screen_size.x, 70)
+#	#TODO use bits to split layers
+#	var mask_layer = 4 #this is the layer 3
+#	var query = PhysicsRayQueryParameters2D.create(ray_start, ray_end, mask_layer, [self])
+#
+#	var result = space_state.intersect_ray(query)
+#	if result:
+#		print("Hit at point: ", result.position)
+#		print("global_position: ", player.global_position)
+#	var sp2 = space_state
 	
 func generate_tiles_around_player() -> void:
 	
