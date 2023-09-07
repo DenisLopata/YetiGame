@@ -18,6 +18,7 @@ extends Node2D
 ## Enemies
 @export var Yeti: Node2D
 
+@onready var _screen_size = self.get_viewport_rect().size
 @onready var yeti_node := preload("res://Scenes/Entities/Yeti.tscn")
 var non_path_array = PackedVector2Array()
 var non_path_array_global = PackedVector2Array()
@@ -25,22 +26,48 @@ var path_array_global = PackedVector2Array()
 var path_pole_array_global = []
 var current_pole_position : Vector2
 var img_size_px := 16
+var pole_position_dict = {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _physics_process(delta):
+	#check if empty dictionary
+	if pole_position_dict:
+		_add_ray_to_poles(pole_position_dict)
 	pass
 	
 func _generate_map(player_position: Vector2) -> void:
 	_add_trees()
 	_add_flags()
-	_add_poles()
+	pole_position_dict = _add_poles() as Dictionary
+	
 	# We store references to all asteroids to free them later.
 #	_sectors[Vector2(x_id, y_id)] = sector_data
+
+func _add_ray_to_poles(pole_position_dict: Dictionary) -> void:
+	
+	
+	var space_state = get_world_2d().direct_space_state
+	
+	for value in pole_position_dict.values():
+		var start_coord = value["start"] as Vector2
+		var end_coord = value["end"] as Vector2
+		
+		# use global coordinates, not local to node
+		var ray_start := Vector2(0 - _screen_size.x, start_coord.y)
+		var ray_end = Vector2(0 + _screen_size.x, start_coord.y)
+		#TODO use bits to split layers
+		var mask_layer = 4 #this is the layer 3
+		var query = PhysicsRayQueryParameters2D.create(ray_start, ray_end, mask_layer, [self])
+		
+		var result = space_state.intersect_ray(query)
+		if result:
+			print("Hit at point: ", result.position)
+		var sp2 = space_state
+		pass
 
 func _add_trees() -> void:
 	# List of entities generated in this sector.
@@ -66,13 +93,13 @@ func _add_flags() -> void:
 		flag.position = non_path_array_global[randi()%non_path_array_global.size()]
 		sector_data.append(flag)
 	
-func _add_poles() -> void:
+func _add_poles() -> Dictionary:
 	# List of entities generated in this sector.
 	var sector_data := []
-	
+	var pole_dictionary = {}
 	for _i in range(number_of_poles):
 		if path_pole_array_global.size() == 0:
-			return
+			return pole_dictionary
 		#create first pole
 		var pole := Pole.instantiate()
 		add_child(pole)
@@ -103,14 +130,21 @@ func _add_poles() -> void:
 		
 		#create space on Y axis
 		path_pole_array_global = path_pole_array_global.filter(space_between_y)
-		
+		var start_pos = Vector2.ZERO
+		var end_pos = Vector2.ZERO
 		if(pole.position.x > pole_end.position.x):
 			pole.set_flip_h = true
+			start_pos = pole_end.position
+			end_pos = pole.position
 		else:
 			pole_end.set_flip_h = true
+			start_pos = pole.position
+			end_pos = pole_end.position
 			
 		sector_data.append(pole)
 		sector_data.append(pole_end)
+		pole_dictionary["Pole" + str(_i)] = {"start" : start_pos, "end" : end_pos }
+	return pole_dictionary
 	
 func space_between_y(vector: Vector2):
 	if vector.y <= current_pole_position.y - img_size_px * 5 or vector.y >= current_pole_position.y + img_size_px * 5:

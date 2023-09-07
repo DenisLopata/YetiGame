@@ -17,6 +17,7 @@ script = ExtResource("1_mn166")
 
 [node name="PlayerBody" type="CharacterBody2D" parent="."]
 position = Vector2(50, 50)
+collision_layer = 5
 script = ExtResource("1_nkj11")
 
 [node name="Sprite" type="Sprite2D" parent="PlayerBody"]
@@ -30,3 +31,8 @@ shape = SubResource("CapsuleShape2D_y4iey")
 [node name="Trail" type="Marker2D" parent="PlayerBody"]
 
 [node name="TrailSprite" type="Sprite2D" parent="PlayerBody/Trail"]
+
+[node name="Area" type="Area2D" parent="PlayerBody"]
+
+[node name="CollisionShape" type="CollisionShape2D" parent="PlayerBody/Area"]
+shape = SubResource("CapsuleShape2D_y4iey")
