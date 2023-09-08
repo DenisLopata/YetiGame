@@ -27,13 +27,16 @@ var path_pole_array_global = []
 var current_pole_position : Vector2
 var img_size_px := 16
 var pole_position_dict = {}
+var player_id : int
+
+signal  signal_on_player_pole_axis(poles_y: Array)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
 
 
-func _physics_process(delta):
+func _physics_process(delta: float):
 	#check if empty dictionary
 	if pole_position_dict:
 		_add_ray_to_poles(pole_position_dict)
@@ -65,8 +68,18 @@ func _add_ray_to_poles(pole_position_dict: Dictionary) -> void:
 		
 		var result = space_state.intersect_ray(query)
 		if result:
-			print("Hit at point: ", result.position)
-		var sp2 = space_state
+			if result.collider_id == player_id:
+				var hit_pos = result.position
+				
+				#get poles of Y axis where player hit
+				var poles_y = pole_position_dict.values().filter(func(pole): 
+					var start_pole_coord = pole["start"] as Vector2
+					var end_pole_coord = pole["end"] as Vector2
+					return start_pole_coord.y == result.position.y) as Array
+					
+				signal_on_player_pole_axis.emit(poles_y)
+#				print("Hit at point: ", result.position)
+		
 		pass
 
 func _add_trees() -> void:
