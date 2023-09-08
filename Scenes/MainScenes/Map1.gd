@@ -14,6 +14,7 @@ var background_tiles: Array[Vector2i] = [Vector2i(0,0)
 var map_size_x := 40
 var map_size_y := 200
 
+@onready var player_node = $Player as Node2D
 @onready var player = $Player/PlayerBody as CharacterBody2D
 #@onready var yeti_node = $Yeti as Node2D
 @onready var ground = $Ground as TileMap
@@ -29,11 +30,29 @@ func _ready() -> void:
 	generate_tiles_around_player()
 	var player_position = player.position as Vector2
 	_generate_map(player_position)
-#	_generate_sector(0,0)
-#	generate()
-#	yeti_node = Node2D.new()
+	connect("signal_on_player_pole_axis", self._on_player_pole_axis)
 	add_yeti()
+#	player_node.z_index = 1
 
+func _on_player_pole_axis(poles_y: Array) -> void:
+	var player_pos = player.position as Vector2
+	var callable = Callable(self, "print_args")
+	var start_pole_pos = poles_y[0]["start"]
+	var end_pole_pos = poles_y[0]["end"]
+	if player_pos.x >= start_pole_pos.x and player_pos.x <= end_pole_pos.x:
+		print("Inside")
+	else:
+		print("Outside")
+#	var poles_y = pole_position_dict.values().filter(func(value): 
+#		var start_coord = value["start"] as Vector2
+#		var end_coord = value["end"] as Vector2
+#		return start_coord.y == player_pos.y)
+	pass
+
+func same_y(vector: Object, player_pos: Vector2):
+	if vector.y == player_pos.y:
+		return vector
+	
 func add_yeti() -> void:
 	var yeti = yeti_node.instantiate()
 	yeti.position = player.position
@@ -51,7 +70,7 @@ func _physics_process(_delta: float) -> void:
 	
 	var col_val = player.collision_layer
 	var col_mask = player.collision_mask
-	var player_id = player.get_instance_id()
+	player_id = player.get_instance_id()
 	
 	super._physics_process(_delta)
 #	var space_state = get_world_2d().direct_space_state
@@ -132,4 +151,6 @@ func get_global_coords_from_local(array: PackedVector2Array, tileMap: TileMap) -
 		helper_array.append(tile_pos)
 	return helper_array
 	
+
+
 
