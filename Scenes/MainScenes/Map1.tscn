@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bmjjnndgpu1pj"]
+[gd_scene load_steps=16 format=3 uid="uid://bmjjnndgpu1pj"]
 
 [ext_resource type="Script" path="res://Scenes/MainScenes/Map1.gd" id="1_ugv8s"]
 [ext_resource type="Texture2D" uid="uid://bk7v4lvlana0x" path="res://Assets/Tilesets/tilemap_packed.png" id="2_fsxon"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bgcp42xa2vmx3" path="res://Scenes/Entities/Trees/TreeBrownBig.tscn" id="5_2h0g2"]
 [ext_resource type="PackedScene" uid="uid://1y6jox4mgyts" path="res://Scenes/Entities/Trees/TreeGreenSmall.tscn" id="6_kb5si"]
 [ext_resource type="PackedScene" uid="uid://dltav1d3avqqb" path="res://Scenes/Entities/Trees/TreeBrownSmall.tscn" id="7_stt7f"]
+[ext_resource type="PackedScene" uid="uid://dyiir1ehmj2r" path="res://Scenes/UI/HUD.tscn" id="10_1gbro"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_6ch7b"]
 texture = ExtResource("2_fsxon")
@@ -772,15 +773,4 @@ format = 2
 
 [node name="Player" parent="." instance=ExtResource("3_pah0q")]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-visible = false
-
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = -351.0
-offset_bottom = -224.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(1, 0.301961, 1, 1)
+[node name="HUD" parent="." instance=ExtResource("10_1gbro")]
