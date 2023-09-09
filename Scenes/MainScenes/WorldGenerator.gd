@@ -59,9 +59,10 @@ func _add_ray_to_poles(pole_position_dict: Dictionary) -> void:
 		var start_coord = value["start"] as Vector2
 		var end_coord = value["end"] as Vector2
 		
-		# use global coordinates, not local to node
+		# use global coordinates, not local to node for ray
 		var ray_start := Vector2(0 - _screen_size.x, start_coord.y)
 		var ray_end = Vector2(0 + _screen_size.x, start_coord.y)
+		
 		#TODO use bits to split layers
 		var mask_layer = 4 #this is the layer 3
 		var query = PhysicsRayQueryParameters2D.create(ray_start, ray_end, mask_layer, [self])
@@ -69,15 +70,11 @@ func _add_ray_to_poles(pole_position_dict: Dictionary) -> void:
 		var result = space_state.intersect_ray(query)
 		if result:
 			if result.collider_id == player_id:
-				var hit_pos = result.position
-				
-				#get poles of Y axis where player hit
-				var poles_y = pole_position_dict.values().filter(func(pole): 
-					var start_pole_coord = pole["start"] as Vector2
-					var end_pole_coord = pole["end"] as Vector2
-					return start_pole_coord.y == result.position.y) as Array
-					
-				signal_on_player_pole_axis.emit(poles_y)
+				var key = pole_position_dict.find_key(value)
+				#remove from dictionary once player hit so we do not generate any more rays for pole
+				#TODO see if removing in for loop good idea
+				pole_position_dict.erase(key)
+				signal_on_player_pole_axis.emit(value)
 #				print("Hit at point: ", result.position)
 		
 		pass

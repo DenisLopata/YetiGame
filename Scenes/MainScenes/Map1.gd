@@ -14,11 +14,12 @@ var background_tiles: Array[Vector2i] = [Vector2i(0,0)
 var map_size_x := 40
 var map_size_y := 200
 
+var pole_miss_time = 1.00 as float
 @onready var player_node = $Player as Node2D
 @onready var player = $Player/PlayerBody as CharacterBody2D
-#@onready var yeti_node = $Yeti as Node2D
 @onready var ground = $Ground as TileMap
 @onready var path = $Path as TileMap
+@onready var hud_node = $HUD as CanvasLayer
 
 func _ready() -> void:
 	Flag = load("res://Scenes/Entities/Flag.tscn")
@@ -27,32 +28,30 @@ func _ready() -> void:
 	TreeBrownBig = load("res://Scenes/Entities/Trees/TreeBrownBig.tscn")
 	TreeGreenSmall = load("res://Scenes/Entities/Trees/TreeGreenSmall.tscn")
 	TreeBrownSmall = load("res://Scenes/Entities/Trees/TreeBrownSmall.tscn")
+	hud_node.screen_size = _screen_size
 	generate_tiles_around_player()
 	var player_position = player.position as Vector2
 	_generate_map(player_position)
-	connect("signal_on_player_pole_axis", self._on_player_pole_axis)
+	self.connect("signal_on_player_pole_axis", self._on_player_pole_axis)
 	add_yeti()
+	hud_node.start_level_timer()
 #	player_node.z_index = 1
 
-func _on_player_pole_axis(poles_y: Array) -> void:
+#signal when player reaches pole Y axis
+#check if player inside poles or outside
+#emited once per pole pair
+func _on_player_pole_axis(poles_y: Dictionary) -> void:
 	var player_pos = player.position as Vector2
-	var callable = Callable(self, "print_args")
-	var start_pole_pos = poles_y[0]["start"]
-	var end_pole_pos = poles_y[0]["end"]
+	var start_pole_pos = poles_y["start"]
+	var end_pole_pos = poles_y["end"]
 	if player_pos.x >= start_pole_pos.x and player_pos.x <= end_pole_pos.x:
 		print("Inside")
 	else:
 		print("Outside")
-#	var poles_y = pole_position_dict.values().filter(func(value): 
-#		var start_coord = value["start"] as Vector2
-#		var end_coord = value["end"] as Vector2
-#		return start_coord.y == player_pos.y)
+		hud_node.increment_level_timer_by(pole_miss_time)
 	pass
 
-func same_y(vector: Object, player_pos: Vector2):
-	if vector.y == player_pos.y:
-		return vector
-	
+#put Yeti on map
 func add_yeti() -> void:
 	var yeti = yeti_node.instantiate()
 	yeti.position = player.position
@@ -60,10 +59,11 @@ func add_yeti() -> void:
 	add_child(yeti)
 	Yeti = yeti
 	
-
+#for testing, not used in game
 func _draw():
-	draw_line(Vector2(0 - _screen_size.x, 50), Vector2(0 + _screen_size.x, 50), Color(Color.AQUA), 1)
-	draw_line(Vector2(50, 50), Vector2(55, 55), Color(255, 0, 0), 1)
+#	draw_line(Vector2(0 - _screen_size.x, 50), Vector2(0 + _screen_size.x, 50), Color(Color.AQUA), 1)
+#	draw_line(Vector2(50, 50), Vector2(55, 55), Color(255, 0, 0), 1)
+	pass
 	
 func _physics_process(_delta: float) -> void:
 	$Yeti/YetiBody.follow_player(player.position)
@@ -72,21 +72,8 @@ func _physics_process(_delta: float) -> void:
 	var col_mask = player.collision_mask
 	player_id = player.get_instance_id()
 	
+	#delegate to original class
 	super._physics_process(_delta)
-#	var space_state = get_world_2d().direct_space_state
-#	# use global coordinates, not local to node
-##	var query = PhysicsRayQueryParameters2D.create(Vector2(0, 0), Vector2(50, 100))
-#	var ray_start := Vector2(0 - _screen_size.x, 50)
-#	var ray_end = Vector2(0 + _screen_size.x, 70)
-#	#TODO use bits to split layers
-#	var mask_layer = 4 #this is the layer 3
-#	var query = PhysicsRayQueryParameters2D.create(ray_start, ray_end, mask_layer, [self])
-#
-#	var result = space_state.intersect_ray(query)
-#	if result:
-#		print("Hit at point: ", result.position)
-#		print("global_position: ", player.global_position)
-#	var sp2 = space_state
 	
 func generate_tiles_around_player() -> void:
 	
@@ -125,18 +112,11 @@ func generate_tiles_around_player() -> void:
 				non_path_array.remove_at(same_index)
 				
 		non_path_array_global = get_global_coords_from_local(non_path_array, ground)
-		#convert them to global coords
-#		for non in non_path_array:
-#			var tile_pos2 = ground.map_to_local(non)
-#			non_path_array_global.append(tile_pos2)
 			
 		#convert path to global
 		path_array_global = get_global_coords_from_local(path_coords, path)
 		path_pole_array_global = path_array_global as Array
 		path_pole_array_global = path_pole_array_global.filter(infront_player_position)
-#		for path_coord in path_coords:
-#			var tile_pos2 = path.map_to_local(path_coord)
-#			path_array_global.append(tile_pos2)
 			
 				
 func infront_player_position(vector: Vector2):
