@@ -1,6 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://dyiir1ehmj2r"]
+[gd_scene load_steps=4 format=3 uid="uid://dyiir1ehmj2r"]
 
 [ext_resource type="Script" path="res://Scenes/UI/HUD.gd" id="1_7nm4q"]
+[ext_resource type="FontFile" uid="uid://q8pvpjx0y8qm" path="res://Assets/Fonts/Kenney Pixel.ttf" id="2_p4r3x"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_rba2q"]
+font = ExtResource("2_p4r3x")
+font_size = 32
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_7nm4q")
@@ -8,5 +13,6 @@ script = ExtResource("1_7nm4q")
 [node name="LevelTime" type="Label" parent="."]
 offset_right = 40.0
 offset_bottom = 23.0
+label_settings = SubResource("LabelSettings_rba2q")
 
 [node name="LevelTimer" type="Timer" parent="."]

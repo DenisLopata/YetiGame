@@ -771,6 +771,8 @@ format = 2
 tile_set = SubResource("TileSet_w3as0")
 format = 2
 
+[node name="LevelHolder" type="Node2D" parent="."]
+
 [node name="Player" parent="." instance=ExtResource("3_pah0q")]
 
 [node name="HUD" parent="." instance=ExtResource("10_1gbro")]

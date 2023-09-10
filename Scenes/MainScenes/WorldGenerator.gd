@@ -28,8 +28,11 @@ var current_pole_position : Vector2
 var img_size_px := 16
 var pole_position_dict = {}
 var player_id : int
+var last_path_coord_y: int
+var player_current_position: Vector2i
 
-signal  signal_on_player_pole_axis(poles_y: Array)
+signal signal_on_player_pole_axis(poles_y: Array)
+signal signal_player_reached_finish_line()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -40,6 +43,10 @@ func _physics_process(delta: float):
 	#check if empty dictionary
 	if pole_position_dict:
 		_add_ray_to_poles(pole_position_dict)
+	#check if player reached finish
+	if player_current_position:
+		if player_current_position.y >= last_path_coord_y:
+			signal_player_reached_finish_line.emit()
 	pass
 	
 func _generate_map(player_position: Vector2) -> void:
@@ -51,7 +58,6 @@ func _generate_map(player_position: Vector2) -> void:
 #	_sectors[Vector2(x_id, y_id)] = sector_data
 
 func _add_ray_to_poles(pole_position_dict: Dictionary) -> void:
-	
 	
 	var space_state = get_world_2d().direct_space_state
 	
@@ -75,7 +81,6 @@ func _add_ray_to_poles(pole_position_dict: Dictionary) -> void:
 				#TODO see if removing in for loop good idea
 				pole_position_dict.erase(key)
 				signal_on_player_pole_axis.emit(value)
-#				print("Hit at point: ", result.position)
 		
 		pass
 

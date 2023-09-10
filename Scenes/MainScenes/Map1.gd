@@ -20,22 +20,31 @@ var pole_miss_time = 1.00 as float
 @onready var ground = $Ground as TileMap
 @onready var path = $Path as TileMap
 @onready var hud_node = $HUD as CanvasLayer
+@onready var level_holder_node = $LevelHolder as Node2D
+
+signal game_finished()
 
 func _ready() -> void:
+	_load_scenes()
+	var player_position = player.position as Vector2
+	hud_node.screen_size = _screen_size
+	generate_tiles_around_player()
+	_generate_map(player_position)
+	self.connect("signal_on_player_pole_axis", self._on_player_pole_axis)
+	self.connect("signal_player_reached_finish_line", self._on_player_reached_finish_line)
+	add_yeti()
+	hud_node.start_level_timer()
+	GameData.is_game_over = false
+#	player_node.z_index = 1
+
+func _load_scenes() -> void:
 	Flag = load("res://Scenes/Entities/Flag.tscn")
 	Pole = load("res://Scenes/Entities/Poles/Pole.tscn")
 	TreeGreenBig = load("res://Scenes/Entities/Trees/TreeGreenBig.tscn")
 	TreeBrownBig = load("res://Scenes/Entities/Trees/TreeBrownBig.tscn")
 	TreeGreenSmall = load("res://Scenes/Entities/Trees/TreeGreenSmall.tscn")
 	TreeBrownSmall = load("res://Scenes/Entities/Trees/TreeBrownSmall.tscn")
-	hud_node.screen_size = _screen_size
-	generate_tiles_around_player()
-	var player_position = player.position as Vector2
-	_generate_map(player_position)
-	self.connect("signal_on_player_pole_axis", self._on_player_pole_axis)
-	add_yeti()
-	hud_node.start_level_timer()
-#	player_node.z_index = 1
+	
 
 #signal when player reaches pole Y axis
 #check if player inside poles or outside
@@ -49,6 +58,12 @@ func _on_player_pole_axis(poles_y: Dictionary) -> void:
 	else:
 		print("Outside")
 		hud_node.increment_level_timer_by(pole_miss_time)
+
+func _on_player_reached_finish_line() -> void:
+	GameData.is_game_over = true
+	var finish_time = hud_node.total_time
+	hud_node.stop_level_timer()
+	game_finished.emit()
 	pass
 
 #put Yeti on map
@@ -59,21 +74,24 @@ func add_yeti() -> void:
 	add_child(yeti)
 	Yeti = yeti
 	
+
 #for testing, not used in game
 func _draw():
 #	draw_line(Vector2(0 - _screen_size.x, 50), Vector2(0 + _screen_size.x, 50), Color(Color.AQUA), 1)
 #	draw_line(Vector2(50, 50), Vector2(55, 55), Color(255, 0, 0), 1)
+#	draw_line(Vector2(0 - _screen_size.x, 50), Vector2(0 + _screen_size.x, 50), Color(Color.BLACK), 1)
 	pass
 	
 func _physics_process(_delta: float) -> void:
 	$Yeti/YetiBody.follow_player(player.position)
 	
-	var col_val = player.collision_layer
-	var col_mask = player.collision_mask
-	player_id = player.get_instance_id()
-	
-	#delegate to original class
-	super._physics_process(_delta)
+	if !GameData.is_game_over:
+		var col_val = player.collision_layer
+		var col_mask = player.collision_mask
+		player_id = player.get_instance_id()
+		player_current_position = player.position as Vector2i
+		#delegate to original class
+		super._physics_process(_delta)
 	
 func generate_tiles_around_player() -> void:
 	
@@ -105,7 +123,11 @@ func generate_tiles_around_player() -> void:
 		
 		#get all coords that are not path
 		non_path_array = background_coords
+		var largest_path_y := Vector2.ZERO
 		for coord in path_coords:
+			#get path end coord
+			if coord.y > largest_path_y.y:
+				largest_path_y = coord
 			var non_path = non_path_array.has(coord)
 			var same_index = non_path_array.bsearch(coord)
 			if non_path:
@@ -113,6 +135,10 @@ func generate_tiles_around_player() -> void:
 				
 		non_path_array_global = get_global_coords_from_local(non_path_array, ground)
 			
+		#get global path end Y axis coord
+		var largest_path_y_global = path.map_to_local(largest_path_y)
+		last_path_coord_y = largest_path_y_global.y
+		
 		#convert path to global
 		path_array_global = get_global_coords_from_local(path_coords, path)
 		path_pole_array_global = path_array_global as Array
