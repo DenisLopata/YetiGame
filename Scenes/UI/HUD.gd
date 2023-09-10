@@ -6,12 +6,12 @@ extends CanvasLayer
 @onready var level_time_node := $LevelTime as Label
 @onready var level_timer_node := $LevelTimer as Timer
 
-var total_time : float
+@export var total_time : float
 
 #setters
 func _set_level_time(time: float) -> void:
 	level_time_node.text = str(time)
-	level_time = time	
+	level_time = time
 
 func _set_label_positions(val : Vector2) -> void:
 	level_time_node.position.x = (val.x /2) - 16
@@ -25,6 +25,9 @@ func _ready():
 func start_level_timer() -> void:
 	level_timer_node.start()
 	level_timer_node.timeout.connect(self._on_signal_level_timer_timeout)
+
+func stop_level_timer() -> void:
+	level_timer_node.stop()
 
 func increment_level_timer_by(time: float) -> void:
 	total_time = total_time + time
