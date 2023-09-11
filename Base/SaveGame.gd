@@ -38,7 +38,8 @@ func load_score() :
 		return # Error! We don't have a save to load.
 		
 	var save_game = FileAccess.open(score_file, FileAccess.READ)
-#	var content = file.get_float()
+	var save_data = {}
+	var cnt = 0
 #	return content
 	while save_game.get_position() < save_game.get_length():
 			var json_string = save_game.get_line()
@@ -54,5 +55,10 @@ func load_score() :
 				
 			# Get the data from the JSON object
 			var node_data = json.get_data()
-			pass
+			save_data["Run" + str(cnt)] = {}
+			save_data["Run" + str(cnt)]["player_id"] = node_data["player_id"]
+			save_data["Run" + str(cnt)]["hightscore"] = node_data["hightscore"]
+			save_data["Run" + str(cnt)]["map_id"] = node_data["map_id"]
+			cnt += 1
+	pass
 

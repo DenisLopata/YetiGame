@@ -1,0 +1,117 @@
+[gd_scene load_steps=7 format=3 uid="uid://d11oe5j3uap60"]
+
+[ext_resource type="FontFile" uid="uid://q8pvpjx0y8qm" path="res://Assets/Fonts/Kenney Pixel.ttf" id="1_0n7vb"]
+[ext_resource type="Texture2D" uid="uid://ko3phpvo4e42" path="res://Assets/UI/Buttons/blue_button03.png" id="1_7tyg2"]
+[ext_resource type="Texture2D" uid="uid://dua41q1suqr4j" path="res://Assets/UI/Buttons/blue_button05.png" id="2_djut1"]
+[ext_resource type="Texture2D" uid="uid://dqfsff08ihhfx" path="res://Assets/Yeti/tile_0080.png" id="4_bb7dq"]
+[ext_resource type="Texture2D" uid="uid://c1q1jij2347un" path="res://Assets/Player/tile_0082.png" id="4_hluk2"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_ev8t2"]
+font = ExtResource("1_0n7vb")
+font_size = 32
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MC" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="HB" type="HBoxContainer" parent="MC"]
+layout_mode = 2
+
+[node name="VB" type="VBoxContainer" parent="MC/HB"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="NewGame" type="TextureButton" parent="MC/HB/VB"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("1_7tyg2")
+texture_pressed = ExtResource("2_djut1")
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="MC/HB/VB/NewGame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "New Game"
+label_settings = SubResource("LabelSettings_ev8t2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HighScores" type="TextureButton" parent="MC/HB/VB"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("1_7tyg2")
+texture_pressed = ExtResource("2_djut1")
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="MC/HB/VB/HighScores"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "High Scores"
+label_settings = SubResource("LabelSettings_ev8t2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Quit" type="TextureButton" parent="MC/HB/VB"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("1_7tyg2")
+texture_pressed = ExtResource("2_djut1")
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="MC/HB/VB/Quit"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Quit
+"
+label_settings = SubResource("LabelSettings_ev8t2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="MC/HB"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MC/HB/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 50
+
+[node name="Yeti" type="TextureRect" parent="MC/HB/CenterContainer/VBoxContainer"]
+layout_mode = 2
+texture = ExtResource("4_bb7dq")
+
+[node name="Player" type="TextureRect" parent="MC/HB/CenterContainer/VBoxContainer"]
+layout_mode = 2
+texture = ExtResource("4_hluk2")
+stretch_mode = 3
