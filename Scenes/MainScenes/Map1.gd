@@ -35,6 +35,8 @@ func _ready() -> void:
 	add_yeti()
 	hud_node.start_level_timer()
 	GameData.is_game_over = false
+#	var score = load_score()
+#	pass
 #	player_node.z_index = 1
 
 func _load_scenes() -> void:
@@ -63,7 +65,9 @@ func _on_player_reached_finish_line() -> void:
 	GameData.is_game_over = true
 	var finish_time = hud_node.total_time
 	hud_node.stop_level_timer()
-	game_finished.emit()
+	highscore = finish_time
+	save_score()
+#	game_finished.emit()
 	pass
 
 #put Yeti on map
