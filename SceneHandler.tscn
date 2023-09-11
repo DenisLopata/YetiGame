@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://c0kawgusgd17w"]
+
+[ext_resource type="Script" path="res://SceneHandler.gd" id="1_eicys"]
+[ext_resource type="PackedScene" uid="uid://d11oe5j3uap60" path="res://Scenes/UI/MainMenu.tscn" id="2_h4pxb"]
+
+[node name="SceneHandler" type="Node2D"]
+script = ExtResource("1_eicys")
+
+[node name="MainMenu" parent="." instance=ExtResource("2_h4pxb")]
+offset_right = 640.0
+offset_bottom = 360.0
