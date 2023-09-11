@@ -1,5 +1,5 @@
 class_name WorldGenerator
-extends Node2D
+extends SaveGame
 
 ## The number of items to place on map.
 @export var item_density := 300
