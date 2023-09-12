@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=3 uid="uid://ceecrxwxbow0m"]
+
+[ext_resource type="Script" path="res://Scenes/UI/Scores/Scores.gd" id="1_aq2ee"]
+[ext_resource type="Texture2D" uid="uid://ko3phpvo4e42" path="res://Assets/UI/Buttons/blue_button03.png" id="2_vmkpj"]
+
+[node name="Scores" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_aq2ee")
+
+[node name="MC" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MC"]
+layout_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="MC/CenterContainer"]
+layout_mode = 2
+texture_normal = ExtResource("2_vmkpj")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MC/CenterContainer"]
+custom_minimum_size = Vector2(300, 40)
+layout_mode = 2
+text = "Pokemon is the best"
