@@ -67,7 +67,7 @@ func _on_player_reached_finish_line() -> void:
 	hud_node.stop_level_timer()
 	highscore = finish_time
 	save_score()
-#	game_finished.emit()
+	game_finished.emit()
 	pass
 
 #put Yeti on map
