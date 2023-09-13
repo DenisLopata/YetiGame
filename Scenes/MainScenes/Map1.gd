@@ -35,7 +35,6 @@ func _ready() -> void:
 	add_yeti()
 	hud_node.start_level_timer()
 	GameData.is_game_over = false
-#	var score = load_score()
 #	pass
 #	player_node.z_index = 1
 

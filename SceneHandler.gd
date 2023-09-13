@@ -1,4 +1,4 @@
-extends Node2D
+extends SaveGame
 
 @onready var main_menu_node := $MainMenu as Control
 @onready var bttn_new_game := $MainMenu/MC/HB/VB/NewGame
@@ -40,7 +40,13 @@ func on_highscores_pressed():
 	main_menu_node.queue_free()
 	scores_scene = preload("res://Scenes/UI/Scores/Scores.tscn").instantiate()
 	scores_scene.size = _screen_size
+	scores_scene.save_data = self.load_scores_data()
+	scores_scene.connect("bttn_back_pressed", self.on_scores_back_pressed)
 	add_child(scores_scene)
 	
 func on_quit_pressed():
 	get_tree().quit()
+
+func on_scores_back_pressed():
+	scores_scene.queue_free()
+	load_main_menu()

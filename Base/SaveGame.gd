@@ -4,6 +4,8 @@ extends MyNode2D
 var score_file = "user://highscore.save"
 @export var highscore : float
 
+#enum DATA_REQUESTS { SAVE, LOAD }
+
 var save_dict = {
 	"player_id": "",
 	"hightscore": "",
@@ -11,8 +13,18 @@ var save_dict = {
 	"attempt": ""
 }
 
+#signal on_load_game_requested(data: Dictionary)
+
 func _ready() -> void:
+#	self.ready.connect(request_saved_data.bind(DATA_REQUESTS))
 	pass
+
+#func request_saved_data(request_type: DATA_REQUESTS) -> void:
+#
+#	if request_type == DATA_REQUESTS.LOAD:
+#		var load_data = load_scores_data()
+#		on_load_game_requested.emit(load_data)
+#	pass
 
 func save_score() -> void:
 	
@@ -33,9 +45,9 @@ func save_score() -> void:
 	file.store_line(json_string)
 #	file.store_string(str(highscore))
 	
-func load_score() :
+func load_scores_data() -> Dictionary :
 	if not FileAccess.file_exists(score_file):
-		return # Error! We don't have a save to load.
+		return {} # Error! We don't have a save to load.
 		
 	var save_game = FileAccess.open(score_file, FileAccess.READ)
 	var save_data = {}
@@ -60,5 +72,7 @@ func load_score() :
 			save_data["Run" + str(cnt)]["hightscore"] = node_data["hightscore"]
 			save_data["Run" + str(cnt)]["map_id"] = node_data["map_id"]
 			cnt += 1
+	
 	pass
+	return save_data
 
