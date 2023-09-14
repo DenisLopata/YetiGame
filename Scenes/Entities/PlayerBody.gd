@@ -17,7 +17,7 @@ extends CharacterBody2D
 const SPEED: float = 300.0
 const JUMP_VELOCITY: float = -400.0
 var count: int = 0
-
+var can_move := false as bool
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 # A factor that controls the character's inertia.
@@ -27,7 +27,8 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 #region movement
 func _physics_process(delta: float) -> void:
-	move(delta)
+	if can_move:
+		move(delta)
 
 func move(delta: float) -> void:
 #	move_spaceship(delta)
@@ -140,3 +141,5 @@ func _get_movement() -> Vector2:
 	)
 #endregion
 
+func _on_level_ready_countdown_done() -> void:
+	can_move = true
