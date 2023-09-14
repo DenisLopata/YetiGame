@@ -14,13 +14,13 @@ var background_tiles: Array[Vector2i] = [Vector2i(0,0)
 var map_size_x := 40
 var map_size_y := 200
 
-var pole_miss_time = 1.00 as float
-@onready var player_node = $Player as Node2D
-@onready var player = $Player/PlayerBody as CharacterBody2D
-@onready var ground = $Ground as TileMap
-@onready var path = $Path as TileMap
-@onready var hud_node = $HUD as CanvasLayer
-@onready var level_holder_node = $LevelHolder as Node2D
+var pole_miss_time := 1.00 as float
+@onready var player_node := $Player as Node2D
+@onready var player := $Player/PlayerBody as CharacterBody2D
+@onready var ground := $Ground as TileMap
+@onready var path := $Path as TileMap
+@onready var hud_node := $HUD as CanvasLayer
+@onready var level_holder_node := $LevelHolder as Node2D
 
 signal game_finished()
 
@@ -32,8 +32,14 @@ func _ready() -> void:
 	_generate_map(player_position)
 	self.connect("signal_on_player_pole_axis", self._on_player_pole_axis)
 	self.connect("signal_player_reached_finish_line", self._on_player_reached_finish_line)
+	#notify player that timer is done and he can start move
+	#this is just a bridge between HUD and player
+	hud_node.signal_on_level_ready_countdown_done.connect(Callable(player, "_on_level_ready_countdown_done"))
+#	self.connect("signal_on_level_ready_countdown_done", self._on_level_ready_countdown_done)
 	add_yeti()
-	hud_node.start_level_timer()
+#	hud_node.start_level_timer()
+	hud_node.start_center_message_timer()
+	
 	GameData.is_game_over = false
 #	pass
 #	player_node.z_index = 1
@@ -60,12 +66,16 @@ func _on_player_pole_axis(poles_y: Dictionary) -> void:
 		print("Outside")
 		hud_node.increment_level_timer_by(pole_miss_time)
 
+func _on_level_ready_countdown_done() -> void:
+	pass
+	
 func _on_player_reached_finish_line() -> void:
 	GameData.is_game_over = true
 	var finish_time = hud_node.total_time
 	hud_node.stop_level_timer()
 	highscore = finish_time
 	save_score()
+	await get_tree().create_timer(2.0).timeout
 	game_finished.emit()
 	pass
 
